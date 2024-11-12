@@ -19,6 +19,8 @@ dependencies:
   get_it: ^8.0.2
   flutter_phoenix: ^1.1.1
   provider: ^6.1.2
+  shared_preferences: ^2.3.3
+  easy_localization: ^3.0.7
   
 
 dev_dependencies:
@@ -35,7 +37,8 @@ flutter:
     - assets/json/empty.json
     - assets/json/loading.json
     - assets/json/success.json
-
+    - assets/translations/ar.json
+    - assets/translations/en.json
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

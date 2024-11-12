@@ -8,7 +8,8 @@ class LoginViewModel extends ChangeNotifier {
   bool _isPasswordValid = true;
   bool _isLoginButtonEnabled = false;
   FlowState _state = ContentState();
-  VoidCallback? onLoginSuccess; 
+  VoidCallback? onLoginSuccess;
+
   FlowState get state => _state;
   bool get isLoginButtonEnabled => _isLoginButtonEnabled;
   bool get isUserNameValid => _isUserNameValid;
@@ -27,7 +28,7 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   Future<void> login() async {
-      _state =
+    _state =
         LoadingState(stateRendererType: StateRendererType.popupLoadingState);
     notifyListeners();
 
@@ -37,11 +38,28 @@ class LoginViewModel extends ChangeNotifier {
 
     // Simulate successful login and trigger navigation callback
     _state = ContentState();
-    notifyListeners();  
+    notifyListeners();
     if (onLoginSuccess != null) {
       onLoginSuccess!(); // Trigger navigation callback if set
-    } 
-  
+    }
+  }
+
+  Future<void> changeLanguage() async {
+    // Show loading state
+    _state =
+        LoadingState(stateRendererType: StateRendererType.popupLoadingState);
+    notifyListeners();
+
+    // Simulate language change delay
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    // Trigger language change
+
+    // Callback to handle language change in the view
+
+    // Reset state to ContentState after loading
+    _state = ContentState();
+    notifyListeners();
   }
 
   void _validateInputs() {

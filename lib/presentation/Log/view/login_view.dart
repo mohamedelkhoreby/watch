@@ -1,16 +1,18 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:provider/provider.dart';
+import 'package:watch/app/app_prefs.dart';
 import 'package:watch/presentation/common/state_renderer/state_renderer_impl.dart';
 
+import '../../../app/dependency_injection.dart';
 import '../../resources/string_manager.dart';
 import '../../resources/value_manager.dart';
 import '../view_model/login_viewmodel.dart';
 import '../../routes/route_manager.dart';
 
-
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
-
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -19,6 +21,7 @@ class LoginView extends StatelessWidget {
         viewModel.onLoginSuccess = () {
           Navigator.of(context).pushReplacementNamed(Routes.mainRoute);
         };
+
         return viewModel;
       },
       child: Scaffold(
@@ -46,6 +49,8 @@ class _ContentWidgetState extends State<_ContentWidget> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  final AppPreferences _appPreferences = instance<AppPreferences>();
+  bool switchLanguage = false;
   bool _obscurePassword = false;
 
   @override
@@ -80,8 +85,13 @@ class _ContentWidgetState extends State<_ContentWidget> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Row(
+                  children: [
+                    Switch(value: switchLanguage, onChanged: changeLanguage)
+                  ],
+                ),
                 Text(
-                  AppStrings.usernameText,
+                  AppStrings.usernameText.tr(),
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 const SizedBox(height: AppValue.v20),
@@ -89,7 +99,7 @@ class _ContentWidgetState extends State<_ContentWidget> {
                 const SizedBox(height: AppValue.v20),
                 _buildPasswordField(context),
                 const SizedBox(height: AppValue.v20),
-                const Text(AppStrings.passwordInfo),
+                Text(AppStrings.passwordInfo.tr()),
                 const SizedBox(height: AppValue.v20),
                 _buildLoginButton(context),
               ],
@@ -105,9 +115,10 @@ class _ContentWidgetState extends State<_ContentWidget> {
     return TextFormField(
       controller: usernameController,
       decoration: InputDecoration(
-        errorText: viewModel.isUserNameValid ? null : AppStrings.usernameError,
+        errorText:
+            viewModel.isUserNameValid ? null : AppStrings.usernameError.tr(),
         border: const OutlineInputBorder(),
-        labelText: AppStrings.usernameText,
+        labelText: AppStrings.usernameText.tr(),
       ),
     );
   }
@@ -118,8 +129,9 @@ class _ContentWidgetState extends State<_ContentWidget> {
       controller: passwordController,
       obscureText: _obscurePassword,
       decoration: InputDecoration(
-        errorText: viewModel.isPasswordValid ? null : AppStrings.passwordError,
-        labelText: AppStrings.passwoerdText,
+        errorText:
+            viewModel.isPasswordValid ? null : AppStrings.passwordError.tr(),
+        labelText: AppStrings.passwoerdText.tr(),
         border: const OutlineInputBorder(),
         suffixIcon: IconButton(
           icon: Icon(
@@ -138,8 +150,14 @@ class _ContentWidgetState extends State<_ContentWidget> {
   Widget _buildLoginButton(BuildContext context) {
     final viewModel = Provider.of<LoginViewModel>(context);
     return ElevatedButton(
-      onPressed: viewModel.isLoginButtonEnabled ? () => viewModel.login() : null,
-      child: const Text(AppStrings.loginBtn),
+      onPressed:
+          viewModel.isLoginButtonEnabled ? () => viewModel.login() : null,
+      child: Text(AppStrings.loginBtn.tr()),
     );
+  }
+
+  changeLanguage(bool value) {
+    _appPreferences.changeAppLanguage();
+    Phoenix.rebirth(context);
   }
 }

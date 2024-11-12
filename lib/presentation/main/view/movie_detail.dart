@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:watch/domain/model/models.dart';
 import 'package:watch/presentation/resources/value_manager.dart';
@@ -40,7 +41,7 @@ class MovieDetail extends StatelessWidget {
               ),
               const SizedBox(height: AppValue.v8),
               Text(
-                '${AppStrings.releaseDataText} ${movie.releaseDate}',
+                '${AppStrings.releaseDataText.tr()} ${movie.releaseDate}',
                 style: const TextStyle(
                   fontSize: AppValue.v16,
                   color: Colors.grey,
@@ -48,9 +49,9 @@ class MovieDetail extends StatelessWidget {
               ),
               const SizedBox(height: AppValue.v16),
               // Overview
-              const Text(
-                AppStrings.overviewText,
-                style: TextStyle(
+               Text(
+                AppStrings.overviewText.tr(),
+                style: const TextStyle(
                   fontSize: AppValue.v20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -72,7 +73,7 @@ class MovieDetail extends StatelessWidget {
                   ),
                   const SizedBox(width: AppValue.v16),
                   Text(
-                    '${movie.voteCount} ${AppStrings.votesText}',
+                    '${movie.voteCount} ${AppStrings.votesText.tr()}',
                     style: const TextStyle(fontSize: AppValue.v16, color: Colors.grey),
                   ),
                 ],
@@ -80,7 +81,7 @@ class MovieDetail extends StatelessWidget {
               const SizedBox(height: AppValue.v16),
               // Popularity
               Text(
-                '${AppStrings.popularityText} ${movie.popularity}',
+                '${AppStrings.popularityText.tr()} ${movie.popularity}',
                 style: const TextStyle(fontSize: AppValue.v16),
               ),
             ],
