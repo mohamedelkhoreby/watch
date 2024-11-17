@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:watch/data/datasource/local_datasource.dart';
 import 'package:watch/data/datasource/remote_datasource.dart';
 import 'package:watch/data/mapper/mapper.dart';
+import 'package:watch/data/network/request.dart';
 import 'package:watch/domain/model/models.dart';
 
 import '../../domain/repository/repository.dart';
@@ -18,7 +19,7 @@ class RepositoryImpl implements Repository {
   RepositoryImpl(
       this._networkInfo, this._localDataSource, this._remoteDataSource);
   @override
-  Future<Either<Failure, MoviesData>> getHomeData() async {
+  Future<Either<Failure, MoviesData>> getHomeData(PageRequest pageRequest) async {
     try {
       // get from cache
       final response = await _localDataSource.getHome();
@@ -29,7 +30,7 @@ class RepositoryImpl implements Repository {
       if (await _networkInfo.isConnected) {
         try {
           // its safe to call the API
-          final response = await _remoteDataSource.getHomeData();
+          final response = await _remoteDataSource.getHomeData(pageRequest);
           if (response.data!.isNotEmpty) // success
           {
             // return data (success)

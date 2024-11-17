@@ -6,7 +6,7 @@ import '../../app/constant.dart';
 
 abstract class AppServiceClient {
   /// Fetch the list of movies from the home endpoint
-  Future<MoviesResponse> getHomeData();
+  Future<MoviesResponse> getHomeData(int page);
 }
 
 class AppServiceClientImpl implements AppServiceClient {
@@ -14,10 +14,12 @@ class AppServiceClientImpl implements AppServiceClient {
   final String _baseUrl = Constants.baseUrl;
   final String _token = Constants.token;
   @override
-  Future<MoviesResponse> getHomeData() async {
-    // Set query parameters according to the TMDB API
-    final queryParameters = <String, dynamic>{};
-
+  Future<MoviesResponse> getHomeData(int page) async {
+    // Parameters for the request
+    final parameters = {
+      'api_key': 'YOUR_API_KEY', // Replace with your actual API key
+      'page': page
+    };
     // Define headers if needed (e.g., for authentication)
     final headers = <String, dynamic>{
       'Authorization': 'Bearer $_token', // Replace with your token
@@ -26,23 +28,20 @@ class AppServiceClientImpl implements AppServiceClient {
     // Add PrettyDioLogger interceptor to log requests and responses
     if (kDebugMode) {
       dio.interceptors.add(PrettyDioLogger(
-        requestHeader: true,
-        requestBody: true,
-        responseHeader: true,
       ));
     }
     // Fetch data using Dio
     final result = await dio
         .fetch<Map<String, dynamic>>(_setStreamType<MoviesResponse>(Options(
-      //   receiveTimeout: const Duration(minutes: 1),
-      // sendTimeout: const Duration(minutes: 1),
+       receiveTimeout: const Duration(seconds: 15),
+       sendTimeout: const Duration( seconds: 15),
       method: 'GET',
       headers: headers,
     )
             .compose(
               dio.options,
               '/discover/movie', // Updated endpoint
-              queryParameters: queryParameters,
+              queryParameters: parameters,
             )
             .copyWith(baseUrl: _baseUrl)));
 

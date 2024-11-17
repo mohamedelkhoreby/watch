@@ -17,6 +17,7 @@ class MainView extends StatelessWidget {
       create: (_) => instance<MainViewModel>()..start(),
       child: Scaffold(
         backgroundColor: Colors.white,
+        bottomNavigationBar: const BottomBar(),
         body: Consumer<MainViewModel>(
           builder: (context, viewModel, child) {
             return viewModel.state.getScreenWidget(
@@ -31,12 +32,42 @@ class MainView extends StatelessWidget {
   }
 }
 
+class BottomBar extends StatelessWidget {
+  const BottomBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final viewModel = Provider.of<MainViewModel>(context);
+    final currentPage = viewModel.mainViewObject?.page ?? 1;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        arrowIcon(() {
+          viewModel.setPageNum(currentPage + 1);
+        }, const Icon(Icons.arrow_back_ios)),
+        Text("Page $currentPage"),
+        arrowIcon(() {
+          if (currentPage > 1) {
+            viewModel.setPageNum(currentPage - 1);
+          }
+        }, const Icon(Icons.arrow_forward_ios)),
+      ],
+    );
+  }
+
+  Widget arrowIcon(VoidCallback onPressed, Icon icon) {
+    return IconButton(onPressed: onPressed, icon: icon);
+  }
+}
+
 class _ContentWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<MainViewModel>();
     final movies = context.watch<MainViewModel>().mainViewObject?.movies ?? [];
 
     return ListView.builder(
+      key: ValueKey(viewModel.mainViewObject?.page ?? 0),
       itemCount: movies.length,
       itemBuilder: (context, index) {
         final Results movie = movies[index];
@@ -112,7 +143,7 @@ class _MovieListItem extends StatelessWidget {
     );
   }
 
-  void _navigateToDetail(BuildContext context, Results movie) {
+  _navigateToDetail(BuildContext context, Results movie) {
     Navigator.push(
       context,
       MaterialPageRoute(

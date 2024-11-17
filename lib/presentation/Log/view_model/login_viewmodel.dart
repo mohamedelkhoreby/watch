@@ -53,9 +53,6 @@ class LoginViewModel extends ChangeNotifier {
     // Simulate language change delay
     await Future.delayed(const Duration(milliseconds: 500));
 
-    // Trigger language change
-
-    // Callback to handle language change in the view
 
     // Reset state to ContentState after loading
     _state = ContentState();

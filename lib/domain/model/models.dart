@@ -50,7 +50,3 @@ class MoviesData {
   List<Results> results;
   MoviesData(this.page, this.results);
 }
-class HomeObject {
-  MoviesData data;
-  HomeObject(this.data);
-}
