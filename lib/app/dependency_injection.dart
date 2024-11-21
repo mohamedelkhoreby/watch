@@ -10,7 +10,7 @@ import '../data/network/network_info.dart';
 import '../data/repo/repository_impl.dart';
 import '../domain/repository/repository.dart';
 import '../domain/usecase/home_usecase.dart';
-import '../presentation/main/view_model/main_viewmodel.dart';
+import '../presentation/main/view_model/main_view_bloc.dart';
 
 final instance = GetIt.instance;
 
@@ -46,6 +46,9 @@ Future<void> initAppModule() async {
 initHomeModule() {
   if (!GetIt.I.isRegistered<HomeUseCase>()) {
     instance.registerFactory<HomeUseCase>(() => HomeUseCase(instance()));
-    instance.registerFactory<MainViewModel>(() => MainViewModel(instance()));
+  }
+  if (!GetIt.I.isRegistered<MainViewBloc>()) {
+    instance.registerLazySingleton<MainViewBloc>(
+        () => MainViewBloc(instance<HomeUseCase>()));
   }
 }

@@ -21,6 +21,8 @@ dependencies:
   provider: ^6.1.2
   shared_preferences: ^2.3.3
   easy_localization: ^3.0.7
+  flutter_bloc: ^8.1.6
+  equatable: ^2.0.5
   
 
 dev_dependencies:
