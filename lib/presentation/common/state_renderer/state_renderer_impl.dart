@@ -125,7 +125,7 @@ extension FlowStateExtension on FlowState {
       case SuccessState:
         {
           // i should check if we are showing loading popup to remove it before showing success popup
-          dismissDialog(context);
+        //  dismissDialog(context);
 
           // show popup
           showPopup(context, StateRendererType.popupSuccess, getMessage(),

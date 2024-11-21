@@ -28,7 +28,7 @@ class Results {
   final double voteAverage;
   final int voteCount;
   Results(
-   this.id,
+    this.id,
     this.title,
     this.originalTitle,
     this.originalLanguage,
@@ -49,4 +49,10 @@ class MoviesData {
   int page;
   List<Results> results;
   MoviesData(this.page, this.results);
+}
+
+class MainViewObject {
+  final int page;
+  final List<Results> movies;
+  MainViewObject(this.page, this.movies);
 }

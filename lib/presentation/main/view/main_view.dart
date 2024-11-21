@@ -1,76 +1,101 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../app/constant.dart';
 import '../../../app/dependency_injection.dart';
 import '../../../domain/model/models.dart';
 import '../../common/state_renderer/state_renderer_impl.dart';
 import '../../resources/value_manager.dart';
-import '../view_model/main_viewmodel.dart';
+import '../view_model/main_view_bloc.dart';
+import '../view_model/main_view_event.dart';
+import '../view_model/main_view_state.dart';
 import 'movie_detail.dart';
 
-class MainView extends StatelessWidget {
+class MainView extends StatefulWidget {
   const MainView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => instance<MainViewModel>()..start(),
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        bottomNavigationBar: const BottomBar(),
-        body: Consumer<MainViewModel>(
-          builder: (context, viewModel, child) {
-            return viewModel.state.getScreenWidget(
-              context,
-              _ContentWidget(),
-              () => viewModel.start(),
-            );
-          },
-        ),
-      ),
-    );
-  }
+  State<MainView> createState() => _MainViewState();
 }
 
-class BottomBar extends StatelessWidget {
-  const BottomBar({super.key});
+class _MainViewState extends State<MainView> {
+  late final MainViewBloc bloc;
+  late int page;
+  @override
+  void initState() {
+    page = 1;
+    instance.resetLazySingleton<MainViewBloc>();
+    bloc = instance<MainViewBloc>();
+    bloc.add(FetchHomeDataEvent(page));
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<MainViewModel>(context);
-    final currentPage = viewModel.mainViewObject?.page ?? 1;
+    return Scaffold(
+      backgroundColor: Colors.white,
+      bottomNavigationBar: _BottomBar(),
+      body: BlocBuilder<MainViewBloc, MainViewState>(
+        bloc: bloc,
+        builder: (context, state) {
+          return state.getScreenWidget(
+            context,
+            _ContentWidget(),
+            () => bloc.add(const FetchHomeDataEvent(1)),
+          );
+        },
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    bloc.close();
+    super.dispose();
+  }
+}
+
+class _BottomBar extends StatelessWidget {
+  final bloc = instance<MainViewBloc>();
+
+  @override
+  Widget build(BuildContext context) {
+    int currentPage = 1;
+    if (bloc.state is MainViewContentState) {
+      currentPage = bloc.mainViewObject?.page ?? 1;
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         arrowIcon(() {
-          viewModel.setPageNum(currentPage + 1);
+          bloc.add(ChangePageEvent(currentPage + 1));
         }, const Icon(Icons.arrow_back_ios)),
-        Text("Page $currentPage"),
+        Text("Page ${bloc.mainViewObject?.page??1}"),
         arrowIcon(() {
           if (currentPage > 1) {
-            viewModel.setPageNum(currentPage - 1);
+            bloc.add(ChangePageEvent(currentPage - 1));
           }
         }, const Icon(Icons.arrow_forward_ios)),
       ],
     );
   }
 
-  Widget arrowIcon(VoidCallback onPressed, Icon icon) {
+  arrowIcon(VoidCallback onPressed, Icon icon) {
     return IconButton(onPressed: onPressed, icon: icon);
   }
 }
 
 class _ContentWidget extends StatelessWidget {
+  final bloc = instance<MainViewBloc>();
+
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<MainViewModel>();
-    final movies = context.watch<MainViewModel>().mainViewObject?.movies ?? [];
-
+    final movies = bloc.mainViewObject?.movies ?? [];
     return ListView.builder(
-      key: ValueKey(viewModel.mainViewObject?.page ?? 0),
       itemCount: movies.length,
       itemBuilder: (context, index) {
-        final Results movie = movies[index];
+        final movie = movies[index];
         return _MovieListItem(movie: movie);
       },
     );
