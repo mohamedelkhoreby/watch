@@ -7,6 +7,7 @@ class LoginViewModel extends ChangeNotifier {
   bool _isUserNameValid = true;
   bool _isPasswordValid = true;
   bool _isLoginButtonEnabled = false;
+  bool _isPasswordObscured = true;
   FlowState _state = ContentState();
   VoidCallback? onLoginSuccess;
 
@@ -14,16 +15,20 @@ class LoginViewModel extends ChangeNotifier {
   bool get isLoginButtonEnabled => _isLoginButtonEnabled;
   bool get isUserNameValid => _isUserNameValid;
   bool get isPasswordValid => _isPasswordValid;
+  bool get isPasswordObscured => _isPasswordObscured;
 
   void setUserName(String userName) {
     _isUserNameValid = userName.isNotEmpty;
     _validateInputs();
-    notifyListeners();
   }
 
   void setPassword(String password) {
     _isPasswordValid = passwordValid(password);
     _validateInputs();
+  }
+
+  void togglePasswordVisibility() {
+    _isPasswordObscured = !_isPasswordObscured;
     notifyListeners();
   }
 
@@ -32,34 +37,34 @@ class LoginViewModel extends ChangeNotifier {
         LoadingState(stateRendererType: StateRendererType.popupLoadingState);
     notifyListeners();
 
-    await Future.delayed(
-      const Duration(seconds: 4),
-    );
+    await Future.delayed(const Duration(seconds: 2));
 
-    // Simulate successful login and trigger navigation callback
-    _state = ContentState();
-    notifyListeners();
-    if (onLoginSuccess != null) {
-      onLoginSuccess!(); // Trigger navigation callback if set
+    if (_isUserNameValid && _isPasswordValid) {
+      _state = ContentState();
+      notifyListeners();
+      if (onLoginSuccess != null) {
+        onLoginSuccess!();
+      }
+    } else {
+      _state = ErrorState(StateRendererType.popupErrorState,
+          "Login failed. Please check your credentials.");
+      notifyListeners();
     }
   }
 
   Future<void> changeLanguage() async {
-    // Show loading state
     _state =
         LoadingState(stateRendererType: StateRendererType.popupLoadingState);
     notifyListeners();
 
-    // Simulate language change delay
     await Future.delayed(const Duration(milliseconds: 500));
 
-
-    // Reset state to ContentState after loading
     _state = ContentState();
     notifyListeners();
   }
 
   void _validateInputs() {
     _isLoginButtonEnabled = _isUserNameValid && _isPasswordValid;
+    notifyListeners();
   }
 }

@@ -13,6 +13,7 @@ class AppStrings {
   static const String passwordError = "passwordError";
   static const String passwordInfo = "passwordInfo";
   static const String loginBtn = "loginBtn";
+  static const String retry = "retry";
 
   static const String success = "success";
 }

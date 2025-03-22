@@ -14,17 +14,16 @@ class MainViewBloc extends Bloc<MainViewEvent, MainViewState> {
     on<FetchHomeDataEvent>(_fetchHomeData);
     on<ChangePageEvent>(_changePage);
   }
-
   final HomeUseCase _homeUseCase;
   MainViewObject? _mainViewObject;
   var _page = PageObject(1);
 
   MainViewObject? get mainViewObject => _mainViewObject;
 
-  Future<void> _fetchHomeData(event, emit) async {
+  Future<void> _fetchHomeData(
+      FetchHomeDataEvent event, Emitter<MainViewState> emit) async {
     emit(MainViewLoadingState(
         rendererType: StateRendererType.fullScreenLoadingState));
-    print(state);
     final result = await _homeUseCase.execute(PageUseCaseInput(event.page));
     result.fold(
       (failure) {
@@ -34,16 +33,21 @@ class MainViewBloc extends Bloc<MainViewEvent, MainViewState> {
       },
       (data) {
         _mainViewObject = MainViewObject(data.page, data.results);
+        _page = _page.copyWith(page: data.page);
         emit(MainViewContentState());
       },
     );
   }
 
-  _changePage(ChangePageEvent event, Emitter<MainViewState> emit) async {
-    if (event.page > 0) {
-      _page = _page.copyWith(page: event.page);
+  void _changePage(ChangePageEvent event, Emitter<MainViewState> emit) {
+    if (event.page > 0 && event.page != _page.page) {
+      if (_mainViewObject != null) {
+        _mainViewObject = _mainViewObject!.copyWith(page: event.page);
+      }
+      emit(MainViewLoadingState(
+          rendererType: StateRendererType.fullScreenLoadingState));
+
       add(FetchHomeDataEvent(event.page));
-      print(event.page);
-    }
+    } else {}
   }
 }

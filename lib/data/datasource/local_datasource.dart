@@ -1,69 +1,58 @@
-import 'package:watch/data/response/response.dart';
-
+import '../response/response.dart';
 import '../network/error_handler.dart';
 
-const cacheHomeKey = "CACHE_HOME_KEY";
-const cacheHomeInterval = 60 * 1000; // 1 MINUTE IN MILLIS
+String getCacheKey(int page) => "CACHE_HOME_KEY_$page";
+const cacheExpirationTime = 60 * 1000;
 
 abstract class LocalDataSource {
-  Future<MoviesResponse> getHome();
-  Future<void> saveHomeToCache(MoviesResponse homeResponse);
-
+  Future<MoviesResponse> getHome(int page);
+  Future<void> saveHomeToCache(int page,MoviesResponse homeResponse);
   void clearCache();
   void removeFromCache(String key);
 }
 
 class LocalDataSourceImpl implements LocalDataSource {
-  // run time cache
-  Map<String, CachedItem> cacheMap = {};
+  final Map<String, CachedItem> _cacheMap = {};
 
-  @override
-  Future<MoviesResponse> getHome() async {
-    CachedItem? cachedItem = cacheMap[cacheHomeKey];
+@override
+Future<MoviesResponse> getHome(int page) async {
+  String cacheKey = getCacheKey(page);
+  CachedItem? cachedItem = _cacheMap[cacheKey];
 
-    if (cachedItem != null && cachedItem.isValid(cacheHomeInterval)) {
-      return cachedItem.data;
-      // return the response from cache
-    } else {
-      // return error that cache is not valid
-      throw ErrorHandler.handle(DataSource.cacheError);
-    }
+  if (cachedItem != null && cachedItem.isValid(cacheExpirationTime)) {
+    return cachedItem.data;
+  } else {
+    throw ErrorHandler.handle(DataSource.cacheError);
   }
+}
+@override
+ Future<void> saveHomeToCache(int page, MoviesResponse homeResponse) async {
+  String cacheKey = getCacheKey(page);
+  _cacheMap[cacheKey] = CachedItem(homeResponse);
+}
 
-  @override
-  Future<void> saveHomeToCache(MoviesResponse homeResponse) async {
-    cacheMap[cacheHomeKey] = CachedItem(homeResponse);
-  }
 
   @override
   void clearCache() {
-    cacheMap.clear();
+    _cacheMap.clear();
   }
 
   @override
   void removeFromCache(String key) {
-    cacheMap.remove(key);
+    _cacheMap.remove(key);
   }
 }
 
 class CachedItem {
-  dynamic data;
+  final dynamic data;
+  final int cacheTime;
 
-  int cacheTime = DateTime.now().millisecondsSinceEpoch;
-
-  CachedItem(this.data);
+  CachedItem(this.data) : cacheTime = DateTime.now().millisecondsSinceEpoch;
 }
 
 extension CachedItemExtension on CachedItem {
   bool isValid(int expirationTime) {
-    // expirationTime is 60 secs
-    int currentTimeInMillis =
-        DateTime.now().millisecondsSinceEpoch; // time now is 1:00:00 pm
-
-    bool isCacheValid = currentTimeInMillis - expirationTime <
-        cacheTime; // cache time was in 12:59:30
-    // false if current time > 1:00:30
-    // true if current time <1:00:30
-    return isCacheValid;
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    return (currentTime - cacheTime) < expirationTime;
   }
 }

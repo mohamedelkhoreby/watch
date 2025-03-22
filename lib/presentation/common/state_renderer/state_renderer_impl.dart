@@ -80,22 +80,19 @@ extension FlowStateExtension on FlowState {
   Widget getScreenWidget(BuildContext context, Widget contentScreenWidget,
       Function retryActionFunction) {
     switch (runtimeType) {
-      case LoadingState:
+      case const (LoadingState):
         {
           if (getStateRendererType() == StateRendererType.popupLoadingState) {
-            // show popup loading
             showPopup(context, getStateRendererType(), getMessage());
-            // show content ui of the screen
             return contentScreenWidget;
           } else {
-            // full screen loading state
             return StateRenderer(
                 message: getMessage(),
                 stateRendererType: getStateRendererType(),
                 retryActionFunction: retryActionFunction);
           }
         }
-      case ErrorState:
+      case const (ErrorState):
         {
           dismissDialog(context);
           if (getStateRendererType() == StateRendererType.popupErrorState) {
@@ -111,22 +108,19 @@ extension FlowStateExtension on FlowState {
                 retryActionFunction: retryActionFunction);
           }
         }
-      case EmptyState:
+      case const (EmptyState):
         {
           return StateRenderer(
               stateRendererType: getStateRendererType(),
               message: getMessage(),
               retryActionFunction: () {});
         }
-      case ContentState:
+      case const (ContentState):
         {
           return contentScreenWidget;
         }
-      case SuccessState:
+      case const (SuccessState):
         {
-          // i should check if we are showing loading popup to remove it before showing success popup
-        //  dismissDialog(context);
-
           // show popup
           showPopup(context, StateRendererType.popupSuccess, getMessage(),
               title: AppStrings.success);

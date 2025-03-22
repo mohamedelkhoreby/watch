@@ -50,9 +50,16 @@ class MoviesData {
   List<Results> results;
   MoviesData(this.page, this.results);
 }
-
 class MainViewObject {
   final int page;
   final List<Results> movies;
+
   MainViewObject(this.page, this.movies);
+
+  MainViewObject copyWith({int? page, List<Results>? movies}) {
+    return MainViewObject(
+      page ?? this.page,
+      movies ?? this.movies,
+    );
+  }
 }

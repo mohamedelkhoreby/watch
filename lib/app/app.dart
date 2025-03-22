@@ -5,36 +5,29 @@ import 'package:watch/app/app_prefs.dart';
 import '../presentation/routes/route_manager.dart';
 import 'dependency_injection.dart';
 
-class MainApp extends StatefulWidget {
-  //name const
-  const MainApp.internal({super.key});
-
-  final int appState = 0;
-  //singleton or single instance
-  static const MainApp _instance = MainApp.internal();
-  //factory
-  factory MainApp() => _instance;
-  @override
-  AppState createState() => AppState();
-}
-
-class AppState extends State<MainApp> {
-  final AppPreferences _appPreferences = instance<AppPreferences>();
-
-  @override
-  void didChangeDependencies() {
-    _appPreferences.getLocal().then((local) => {context.setLocale(local)});
-    super.didChangeDependencies();
-  }
+class MainApp extends StatelessWidget {
+  const MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        localizationsDelegates: context.localizationDelegates,
-        supportedLocales: context.supportedLocales,
-        locale: context.locale,
-        debugShowCheckedModeBanner: false,
-        onGenerateRoute: RouteGenerator.onGenerateRoute,
-        initialRoute: Routes.loginRoute);
+    return FutureBuilder(
+      future: instance<AppPreferences>().getLocal(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasData) {
+          context.setLocale(snapshot.data!);
+        }
+        return MaterialApp(
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: const Locale("en"),
+          debugShowCheckedModeBanner: false,
+          onGenerateRoute: RouteGenerator.onGenerateRoute,
+          initialRoute: Routes.loginRoute,
+        );
+      },
+    );
   }
 }

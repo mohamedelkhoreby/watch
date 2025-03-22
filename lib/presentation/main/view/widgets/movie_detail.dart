@@ -1,10 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:watch/domain/model/models.dart';
 import 'package:watch/presentation/resources/value_manager.dart';
 
-import '../../../app/constant.dart';
-import '../../resources/string_manager.dart';
+import '../../../../app/constant.dart';
+import '../../../resources/string_manager.dart';
 
 class MovieDetail extends StatelessWidget {
   final Results movie;
@@ -25,9 +26,14 @@ class MovieDetail extends StatelessWidget {
             children: [
               // Movie Poster
               Center(
-                child: Image.network(
-                  '${Constants.imageUrl}${movie.posterPath}',
-                  height: AppValue.s300,
+                child: CachedNetworkImage(
+                  imageUrl: getImageUrl(movie.posterPath),
+                  width: 100,
+                  height: 150,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) =>
+                      const Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => _retryImage(url),
                 ),
               ),
               const SizedBox(height: AppValue.v16),
@@ -49,7 +55,7 @@ class MovieDetail extends StatelessWidget {
               ),
               const SizedBox(height: AppValue.v16),
               // Overview
-               Text(
+              Text(
                 AppStrings.overviewText.tr(),
                 style: const TextStyle(
                   fontSize: AppValue.v20,
@@ -74,7 +80,8 @@ class MovieDetail extends StatelessWidget {
                   const SizedBox(width: AppValue.v16),
                   Text(
                     '${movie.voteCount} ${AppStrings.votesText.tr()}',
-                    style: const TextStyle(fontSize: AppValue.v16, color: Colors.grey),
+                    style: const TextStyle(
+                        fontSize: AppValue.v16, color: Colors.grey),
                   ),
                 ],
               ),
@@ -89,5 +96,25 @@ class MovieDetail extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _retryImage(String url) {
+    return GestureDetector(
+      onTap: () {},
+      child: const Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.refresh, color: Colors.red),
+          Text(AppStrings.retry, style: TextStyle(color: Colors.red)),
+        ],
+      ),
+    );
+  }
+
+  getImageUrl(String? path) {
+    if (path == null || path.isEmpty) {
+      return "https://via.placeholder.com/500";
+    }
+    return "${Constants.imageUrl}$path";
   }
 }

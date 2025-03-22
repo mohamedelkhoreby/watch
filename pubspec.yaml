@@ -19,10 +19,12 @@ dependencies:
   get_it: ^8.0.2
   flutter_phoenix: ^1.1.1
   provider: ^6.1.2
+  path_provider: ^2.1.2
   shared_preferences: ^2.3.3
   easy_localization: ^3.0.7
   flutter_bloc: ^8.1.6
   equatable: ^2.0.5
+  cached_network_image: ^3.4.1
   
 
 dev_dependencies:

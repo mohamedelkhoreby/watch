@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../app/dependency_injection.dart';
-import '../Log/view/login_view.dart';
+import '../Auth/view/login_view.dart';
 import '../main/view/main_view.dart';
 import '../resources/string_manager.dart';
 
@@ -26,7 +26,6 @@ class RouteGenerator {
   static Route<dynamic> unDefinedRoute() {
     return MaterialPageRoute(
       builder: (_) {
-       
         return Scaffold(
           appBar: AppBar(
             title: const Text(AppStrings.data),

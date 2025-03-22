@@ -9,14 +9,13 @@ import 'presentation/resources/language_manager.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  WidgetsFlutterBinding.ensureInitialized();
   await initAppModule();
   runApp(
     EasyLocalization(
       supportedLocales: const [arabicAS, englishUS],
       path: translationsPath,
       child: Phoenix(
-        child: MainApp(),
+        child: const MainApp(),
       ),
     ),
   );
