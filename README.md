@@ -1,4 +1,4 @@
-# watch App
+# Watch App
 This document outlines the specifications and requirements for the Flutter application task during the internship process. The project involves creating a functional app with registration, login, and movie list features, using the **Parse Platform API** for backend and local database integration.
 
 ---
